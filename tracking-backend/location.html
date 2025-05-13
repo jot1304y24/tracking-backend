@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Track Location</title>
+</head>
+
+<body>
+    <h2>Tracking your location...</h2>
+    <p id="status"></p>
+
+    <script>
+        const status = document.getElementById("status");
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const data = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    };
+
+                    fetch("/location", { <!-- relative path -->
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(data)
+                        })
+                        .then(res => res.json())
+                        .then(response => {
+                            status.textContent = "Location sent: ✅";
+                        })
+                        .catch(error => {
+                            status.textContent = "Error sending location.";
+                        });
+                },
+                function(error) {
+                    status.textContent = "Failed to get location: " + error.message;
+                }
+            );
+        } else {
+            status.textContent = "Geolocation not supported.";
+        }
+    </script>
+</body>
+
+</html>
